@@ -13,8 +13,11 @@ function mailredirect7_menu() {
 
   //a settings page
   $items[ 'admin/settings/mailredirect7' ] = array(
-    'page callback' => 'mailredirect7_admin',
+    'page callback' => 'drupal_get_form',
     'title' => 'Administer mailredirect7',
+    'page arguments' => array(
+      'mailredirect7_admin_form'
+    ),
     'description' => 'Configure the modules which emails should be redirected. Also give the emailaddress',
     'access arguments' => array(
       'admin mailredirect7',
@@ -41,9 +44,13 @@ function mailredirect7_menu() {
 /**
  * Implemens hook_perm().
  */
-function mailredirect7_perm() {
+function mailredirect7_permission() {
   return array(
-    'admin mailredirect',
+    'admin mailredirect' => array(
+      'title' => t('Administer mailredirect7'),
+      'description' => t('If the user have this permission it can administer and
+        test the mailredirect7 module.'),
+    ),
   );
 }
 
@@ -93,7 +100,7 @@ function mailredirect7_mail_alter(&$message) {
 
 /**
  * Returning an array of modules which implements the hook_mail
- * @return Array with modules which implements hook_mail().
+ * @return Array with modules which implementing hook_mail().
  */
 function mailredirect7_getmodules() {
   $return = array( );

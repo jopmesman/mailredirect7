@@ -7,25 +7,14 @@
  */
 
 /**
- * Return an admin form
- */
-function mailredirect7_admin() {
-  $return = '';
-
-  $return = drupal_get_form('mailredirect7_admin_form');
-
-  return $return;
-}
-
-/**
  * Hook_form
  */
-function mailredirect7_admin_form() {
+function mailredirect7_admin_form($form, &$form_state) {
   $form = array();
 
   //List of emailaddresses
   $form['mailredirect7_to_list'] = array(
-    '#title' => t('To who will the redirected mail be send'),
+    '#title' => t('To who will the redirected mail(s) be send'),
     '#description' => t('Give a list of emailaddresses. This emailaddresses will be used to redirect the mail to. To give more emailaddresses use a comma to separate.'),
     '#type' => 'textfield',
     '#default_value' => variable_get( 'mailredirect7_to_list', '' ),
@@ -38,7 +27,7 @@ function mailredirect7_admin_form() {
     '#title' => 'Modules',
   );
 
-  //Get the modules which implements hook_mail
+  //Get the modules which implementing hook_mail
   $modules = mailredirect7_getmodules();
 
   $form[$fieldset_id]['mailredirect7_modules'] = array(
