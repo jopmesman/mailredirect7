@@ -1,0 +1,5 @@
+name = Mailredirect7
+description = this module intercepts mail of selected modules. It replaces the to email by an given email address and add an header.
+package = Mesman
+core = 7.x
+version = 0.0.1

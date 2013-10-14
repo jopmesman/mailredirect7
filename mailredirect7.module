@@ -1,0 +1,110 @@
+<?php
+
+/**
+ * @file
+ * standard file to start from.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function mailredirect7_menu() {
+  $items = array( );
+
+  //a settings page
+  $items[ 'admin/settings/mailredirect7' ] = array(
+    'page callback' => 'mailredirect7_admin',
+    'title' => 'Administer mailredirect7',
+    'description' => 'Configure the modules which emails should be redirected. Also give the emailaddress',
+    'access arguments' => array(
+      'admin mailredirect7',
+    ),
+    'file' => 'includes/mailredirect7_admin.inc',
+    'type' => MENU_NORMAL_ITEM
+  );
+
+  $items[ 'mailredirect7/testform' ] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array( 'mailredirect7_test_form' ),
+    'title' => 'Test the mailredirect',
+    'description' => 'If the mailredirect7 is on and the module is selected on the configuration page, it can be tested here.',
+    'access arguments' => array(
+      'admin mailredirect7',
+    ),
+    'file' => 'includes/mailredirect7_test.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implemens hook_perm().
+ */
+function mailredirect7_perm() {
+  return array(
+    'admin mailredirect',
+  );
+}
+
+/**
+ * Implements hook_mail().
+ */
+function mailredirect7_mail($key, &$message, $params) {
+  if ( $key == 'test' ) {
+    $message[ 'body' ][ ] = $params[ 'message' ];
+    $message[ 'subject' ] = 'Test mail of mailredirect7';
+  }
+}
+
+/**
+ * Implements hook_mail_alter().
+ */
+function mailredirect7_mail_alter(&$message) {
+  //Get the selected modules
+  $mailredirect7modules = variable_get( 'mailredirect7_modules', array( ) );
+  $module = $message[ 'module' ];
+
+  //Check if the $module is selected.
+  if ( isset( $mailredirect7modules[ $module ] ) and $mailredirect7modules[ $module ] === $module ) {
+    //determine which email should be used.
+    $site_mail = variable_get( 'site_mail' , 'info@example.com' );
+    //If the mailredirect7_to_list is not set, sue the site_mail
+    $to = variable_get( 'mailredirect7_to_list' , $site_mail );
+
+    array_unshift( $message[ 'body' ], sprintf( "**Header: This email would actually be send to: %s Header**\n\n", $message[ 'to' ] ) );
+    $message[ 'to' ] = $to;
+
+    //Clear CC / BCC
+    $message['headers']['cc'] = '';
+    $message['headers']['Cc'] = '';
+    $message['headers']['CC'] = '';
+    $message['headers']['bcc'] = '';
+    $message['headers']['Bcc'] = '';
+    $message['headers']['BCC'] = '';
+  }
+
+  //Add, if necessary, a prefix to the subject
+  $subjectprefix = variable_get( 'mailredirect7_subjectprefix', '' );
+  if ( $subjectprefix != '' ) {
+    $message[ 'subject' ] = t( "(@subjectprefix) @subject", array( '@subjectprefix' => drupal_strtoupper( $subjectprefix ), '@subject' => $message[ 'subject' ] ) );
+  }
+}
+
+/**
+ * Returning an array of modules which implements the hook_mail
+ * @return Array with modules which implements hook_mail().
+ */
+function mailredirect7_getmodules() {
+  $return = array( );
+  $modules = module_implements( 'mail', TRUE );
+
+  //Create an array with key => value pairs
+  if (is_array($modules) and count($modules) > 0 ) {
+    foreach ($modules as $module) {
+      $return[$module] = $module;
+    }
+  }
+
+  return $return;
+}
