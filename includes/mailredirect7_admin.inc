@@ -3,11 +3,10 @@
 /**
  * @file
  * This file is for the admin part of the mailredirect7 module
- *
  */
 
 /**
- * Hook_form
+ * Implements Hook_form().
  */
 function mailredirect7_admin_form($form, &$form_state) {
   $form = array();
@@ -20,8 +19,9 @@ function mailredirect7_admin_form($form, &$form_state) {
     '#default_value' => variable_get( 'mailredirect7_to_list', '' ),
   );
 
+  //Name of the fieldset
   $fieldset_id = 'mailredirect7_admin_fieldset';
-
+  //Define the fieldset
   $form[$fieldset_id] = array(
     '#type' => 'fieldset',
     '#title' => 'Modules',
